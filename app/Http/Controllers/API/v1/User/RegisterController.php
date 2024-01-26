@@ -4,7 +4,9 @@ namespace App\Http\Controllers\API\v1\User;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Mail\EmailVerification;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Mail;
 use App\Http\Requests\API\v1\User\RegisterRequest;
 
 class RegisterController extends Controller
@@ -23,7 +25,9 @@ class RegisterController extends Controller
     public function store(RegisterRequest $request)
     {
         $user = User::create($request->validated());
-
+        $id = $user['id'];
+        $name = $user['name'];
+        Mail::to($user['email'])->send(new EmailVerification($id, $name));
         if(!$user){
             return response()->failed('Failed to Insert Data');
         }
